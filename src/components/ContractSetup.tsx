@@ -222,8 +222,9 @@ function VerifyPanel() {
           args: item.args as never[],
         });
         out.push({ status: 'success', result });
-      } catch {
-        out.push({ status: 'failure', error: 'read error' });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message.slice(0, 120) : String(e).slice(0, 120);
+        out.push({ status: 'failure', error: msg });
       }
       setProgress(i + 1);
       await new Promise(r => setTimeout(r, 150));
@@ -297,7 +298,7 @@ function VerifyPanel() {
                     <span className="text-slate-400 font-mono">{fn}</span>
                     <div className="flex items-center gap-2">
                       {loading && <Loader2 className="w-3 h-3 animate-spin text-slate-500" />}
-                      {isError && <span className="text-red-400 flex items-center gap-1"><XCircle className="w-3 h-3" /> read error</span>}
+                      {isError && <span className="text-red-400 flex items-center gap-1 max-w-xs truncate" title={(res).error}><XCircle className="w-3 h-3" /> {(res).error.slice(0,60)}</span>}
                       {ok && (
                         <span className="text-green-400 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" />
