@@ -39,8 +39,12 @@ interface EarningsState {
 }
 
 const BASE_URL = (import.meta.env['VITE_INDEXER_URL'] as string | undefined) ?? '';
-const INDEXER_AVAILABLE = BASE_URL !== '' || typeof window === 'undefined' ||
-  window.location.hostname === 'localhost' || window.location.hostname.includes('preview');
+const IS_DEV_HOST = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname.includes('preview') ||
+  window.location.hostname.includes('127.0.0.1')
+);
+const INDEXER_AVAILABLE = BASE_URL !== '' || IS_DEV_HOST;
 
 export function useEarningsHistory(address: string | undefined, enabled = false): EarningsState {
   const [state, setState] = useState<EarningsState>(() => ({

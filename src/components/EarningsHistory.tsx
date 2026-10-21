@@ -62,11 +62,13 @@ export function EarningsHistory({ address }: Props) {
 
           {/* Error */}
           {error && !loading && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 0', color: 'var(--danger)', fontSize: 13 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 0', color: 'var(--muted)', fontSize: 13 }}>
               <AlertCircle size={14} />
-              {error.includes('fetch') || error.includes('network') || error.includes('Failed')
-                ? 'Indexer not reachable — start the backend server (bun run server/index.ts)'
-                : error}
+              {error.includes('coming soon')
+                ? 'Earnings history will be available once the platform launches on mainnet.'
+                : error.includes('fetch') || error.includes('network') || error.includes('Failed')
+                  ? 'Earnings history is temporarily unavailable. Please try again later.'
+                  : error}
             </div>
           )}
 
