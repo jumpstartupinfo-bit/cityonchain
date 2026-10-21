@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+* { box-sizing: border-box; }
+
+:root {
+  /* Canvas — warm cream like Lagos Life */
+  --bg:               #f2f5ef;
+  --bg-alt:           #e8ede4;
+  --bg-dark:          #1a2e1a;
+
+  /* Surfaces */
+  --surface:          rgba(255,255,255,0.82);
+  --surface-strong:   rgba(255,255,255,0.96);
+  --surface-dark:     rgba(26,46,26,0.88);
+  --surface-muted:    rgba(255,255,255,0.55);
+  --glass:            rgba(255,255,255,0.72);
+  --glass-border:     rgba(255,255,255,0.86);
+
+  /* Ink */
+  --ink:              #111c11;
+  --ink-2:            #2d3d2d;
+  --muted:            #5a7055;
+  --subtle:           #8aa882;
+
+  /* Borders */
+  --border:           rgba(60,90,55,0.14);
+  --border-strong:    rgba(45,122,58,0.35);
+
+  /* Brand green — Lagos Life primary */
+  --green:            #2d7a3a;
+  --green-light:      #3a9648;
+  --green-dark:       #1e5228;
+  --green-dim:        rgba(45,122,58,0.12);
+  --green-glow:       rgba(45,122,58,0.25);
+
+  /* Accent gold for owned/premium */
+  --accent:           #c8922a;
+  --accent-light:     #e0a83a;
+  --accent-dim:       rgba(200,146,42,0.14);
+
+  /* Semantic */
+  --success:          #22c55e;
+  --danger:           #ef4444;
+  --warning:          #f59e0b;
+
+  /* Map tile colors by tier */
+  --tier-1:           #1e5228;
+  --tier-2:           #2d7a3a;
+  --tier-3:           #3a9648;
+  --tier-4:           #4fb860;
+  --tier-5:           #7dd494;
+  --tier-6:           #b2e8bd;
+
+  /* Isometric */
+  --iso-ground:       #d4e8cc;
+  --iso-road:         #a8b8a0;
+  --iso-water:        #7ab8d4;
+  --iso-building-1:   #2d7a3a;
+  --iso-building-2:   #ffffff;
+  --iso-shadow:       rgba(26,46,26,0.18);
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.display { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.03em; }
+.mono    { font-family: 'JetBrains Mono', Menlo, monospace; }
+
+/* Isometric world tile */
+.iso-world {
+  transform: rotateX(55deg) rotateZ(-45deg);
+  transform-style: preserve-3d;
+}
+.iso-container {
+  perspective: 1200px;
+  perspective-origin: 50% 30%;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(45,122,58,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(45,122,58,0.45); }
+
+/* Activity ticker */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.ticker-track { animation: ticker 28s linear infinite; }
+
+/* Pulse ring for first-refusal */
+@keyframes pulse-ring {
+  0%   { transform: scale(0.9); opacity: 0.8; }
+  50%  { transform: scale(1.1); opacity: 0.4; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+.pulse-ring { animation: pulse-ring 2s ease-in-out infinite; }
+
+/* Billboard shimmer */
+@keyframes billboard-shine {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Floating nav shadow */
+.nav-float {
+  box-shadow: 0 4px 24px rgba(26,46,26,0.14), 0 1px 0 rgba(255,255,255,0.6) inset;
+}
+
+/* Tile hover */
+.city-tile:hover { filter: brightness(1.12); }
+.city-tile { transition: filter 0.15s, transform 0.15s; cursor: pointer; }
+.city-tile:hover { transform: translateZ(4px); }
+
+/* Activity feed row entrance */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes feedIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
