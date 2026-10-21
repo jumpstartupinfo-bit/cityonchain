@@ -39,6 +39,22 @@ export default defineConfig({
       'vite-plugin-node-polyfills/shims/process',
     ],
   },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react/jsx-runtime'],
+          'vendor-wagmi': ['wagmi', 'viem'],
+          'vendor-connectkit': ['connectkit'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-circle': ['@circle-fin/app-kit', '@circle-fin/adapter-viem-v2', '@circle-fin/modular-wallets-core'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-ui': ['lucide-react', 'sonner', 'clsx', 'tailwind-merge'],
+        },
+      },
+    },
+  },
   server: {
     allowedHosts: true,
     cors: true,

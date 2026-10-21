@@ -39,13 +39,19 @@ interface EarningsState {
 }
 
 const BASE_URL = (import.meta.env['VITE_INDEXER_URL'] as string | undefined) ?? '';
+const INDEXER_AVAILABLE = BASE_URL !== '' || typeof window === 'undefined' ||
+  window.location.hostname === 'localhost' || window.location.hostname.includes('preview');
 
 export function useEarningsHistory(address: string | undefined, enabled = false): EarningsState {
-  const [state, setState] = useState<EarningsState>({ loading: false, rows: [], error: null });
+  const [state, setState] = useState<EarningsState>(() => ({
+    loading: false,
+    rows: [],
+    error: INDEXER_AVAILABLE ? null : 'Earnings history coming soon — backend indexer not yet configured.',
+  }));
   const prevAddress = useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (!enabled || !address) return;
+    if (!enabled || !address || !INDEXER_AVAILABLE) return;
     if (prevAddress.current === address && state.rows.length > 0) return; // cached
     prevAddress.current = address;
 
