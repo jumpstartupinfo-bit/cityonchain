@@ -302,11 +302,15 @@ function WiringRow({ call, index, isCurrent, isDone, isAlreadySet, onDone }: {
   call: WireCall; index: number; isCurrent: boolean; isDone: boolean; isAlreadySet: boolean; onDone: () => void;
 }) {
   const { writeContract, data: txHash, isPending, error: writeError, reset } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash: txHash });
 
+  // Advance as soon as tx is submitted — Arc Testnet receipts can be slow
   useEffect(() => {
-    if (isConfirmed && isCurrent) { onDone(); }
-  }, [isConfirmed, isCurrent, onDone]);
+    if (txHash && isCurrent) {
+      const t = setTimeout(() => onDone(), 1500);
+      return () => clearTimeout(t);
+    }
+  }, [txHash, isCurrent, onDone]);
 
   const send = useCallback(() => {
     writeContract({
@@ -340,8 +344,7 @@ function WiringRow({ call, index, isCurrent, isDone, isAlreadySet, onDone }: {
           </button>
         )}
         {isPending && <span className="ml-auto text-xs text-slate-400 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Confirm in wallet…</span>}
-        {isConfirming && <span className="ml-auto text-xs text-slate-400 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Confirming…</span>}
-        {txHash && isConfirmed && <CheckCircle2 className="w-4 h-4 text-green-400 ml-auto" />}
+        {txHash && !isPending && <span className="ml-auto text-xs text-green-400 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Submitted</span>}
         {writeError && (
           <span className="ml-auto flex items-center gap-1 text-red-400">
             <AlertCircle className="w-3 h-3" />
@@ -387,7 +390,7 @@ function BackfillRow({ cityId, tier, label, owner }: { cityId: bigint; tier: num
     });
   }, [cityId, tier, owner, writeContract]);
 
-  const alreadyMinted = balance !== null && balance >= expectedCount;
+  const alreadyMinted = (balance !== null && balance >= expectedCount) || isConfirmed || !!txHash;
 
   return (
     <div className="flex flex-col gap-1 px-3 py-2">
