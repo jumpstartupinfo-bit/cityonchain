@@ -28,8 +28,6 @@ const arcTransport = isMainnet
   : fallback([
       http('https://rpc.testnet.arc.io'),
       http('https://rpc.blockdaemon.testnet.arc.io'),
-      http('https://rpc.drpc.testnet.arc.io'),
-      http('https://rpc.quicknode.testnet.arc.io'),
     ])
 
 export { arcTestnet, arc }
