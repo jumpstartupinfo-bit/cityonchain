@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContracts } from 'wagmi';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContracts, usePublicClient } from 'wagmi';
 import { toast } from 'sonner';
 import { CheckCircle2, XCircle, Loader2, AlertCircle, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import {
@@ -197,21 +197,47 @@ function CopyAddress({ value }: { value: string }) {
   );
 }
 
-// ── VerifyPanel — one batch read for all slots ─────────────────────────────
+// ── VerifyPanel — sequential reads to avoid RPC rate limits ────────────────
 function VerifyPanel() {
-  const { data, isFetching, refetch } = useReadContracts({
-    contracts: VERIFY_ITEMS.map(item => ({
-      address: item.contract.address,
-      abi: item.contract.abi as never[],
-      functionName: item.fn,
-      args: item.args as never[],
-    })),
-  });
+  const publicClient = usePublicClient();
+  type SlotResult = { status: 'success'; result: unknown } | { status: 'failure'; error: string };
+  const [results, setResults] = useState<SlotResult[]>([]);
+  const [progress, setProgress] = useState(0);
+  const [reading, setReading] = useState(false);
+  const readingRef = useRef(false);
 
-  const results = data ?? [];
-  const allLoaded = !isFetching && results.length === VERIFY_ITEMS.length;
+  const runReads = useCallback(async () => {
+    if (!publicClient || readingRef.current) return;
+    readingRef.current = true;
+    setReading(true);
+    setProgress(0);
+    const out: SlotResult[] = [];
+    for (let i = 0; i < VERIFY_ITEMS.length; i++) {
+      const item = VERIFY_ITEMS[i];
+      try {
+        const result = await publicClient.readContract({
+          address: item.contract.address,
+          abi: item.contract.abi as never[],
+          functionName: item.fn,
+          args: item.args as never[],
+        });
+        out.push({ status: 'success', result });
+      } catch {
+        out.push({ status: 'failure', error: 'read error' });
+      }
+      setProgress(i + 1);
+      await new Promise(r => setTimeout(r, 150));
+    }
+    setResults(out);
+    setReading(false);
+    readingRef.current = false;
+  }, [publicClient]);
+
+  useEffect(() => { void runReads(); }, [runReads]);
+
+  const allLoaded = !reading && results.length === VERIFY_ITEMS.length;
   const passing = allLoaded
-    ? results.filter((r, i) => r.status === 'success' && matches(r.result, VERIFY_ITEMS[i].expected, VERIFY_ITEMS[i].type)).length
+    ? results.filter((r, i) => r.status === 'success' && matches((r).result, VERIFY_ITEMS[i].expected, VERIFY_ITEMS[i].type)).length
     : 0;
   const total = VERIFY_ITEMS.length;
 
@@ -223,13 +249,13 @@ function VerifyPanel() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className={`text-sm font-semibold px-3 py-1 rounded-full ${
-          isFetching ? 'bg-slate-700 text-slate-400'
+          reading ? 'bg-slate-700 text-slate-400'
           : passing === total ? 'bg-green-500/20 text-green-400'
           : 'bg-red-500/20 text-red-400'
         }`}>
-          {isFetching ? 'Reading on-chain state…' : `${passing} of ${total} checks passing`}
+          {reading ? `Reading… (${progress}/${total})` : `${passing} of ${total} checks passing`}
         </div>
-        <button onClick={() => void refetch()} disabled={isFetching}
+        <button onClick={() => void runReads()} disabled={reading}
           className="text-xs text-slate-400 hover:text-white border border-slate-700 rounded px-2 py-1 transition-colors disabled:opacity-40">
           Re-read chain
         </button>
@@ -259,7 +285,7 @@ function VerifyPanel() {
             <div className="px-3 py-2 bg-slate-700/50 text-xs font-semibold text-slate-300">{group}</div>
             <div className="divide-y divide-slate-700/50">
               {groupItems.map(({ item, i }) => {
-                const res = results[i];
+                const res = results[i] as { status: 'success'; result: unknown } | { status: 'failure'; error: string } | undefined;
                 const loading = !res;
                 const isError = res?.status === 'failure';
                 const ok = res?.status === 'success' && matches(res.result, item.expected, item.type);
