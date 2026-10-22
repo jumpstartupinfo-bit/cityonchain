@@ -100,7 +100,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Is this a game?',
-    a: 'CityOnChain is a digital ownership platform with real financial mechanics. It is not a game. All revenue is paid in USDC, a regulated stablecoin issued by Circle. Participation involves financial risk.',
+    a: 'Today, CityOnChain is a digital ownership platform — own cities, earn USDC, grow your portfolio. In Q1 2027, it becomes something more: a fully immersive 3D world where your Mayor License is your passport. Real ownership. Real earnings. A world being built around it.',
   },
   {
     q: 'What blockchain does this run on?',
