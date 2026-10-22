@@ -3,6 +3,7 @@
  * Calls CityProfile.setProfile / clearProfile. Owner-only check enforced in contract.
  */
 import React, { useState, useCallback } from 'react';
+import { useIsMobile } from '../lib/useIsMobile';
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
 import type { Abi } from 'viem';
 import { toast } from 'sonner';
@@ -119,6 +120,7 @@ export function EditProfileModal({ nft, tokenId, entityName, entityCountry, curr
   }
 
   const isBusy = savePending || saveConfirming || clearPending || clearConfirming;
+  const isMobile = useIsMobile();
 
   // Generated baseline for preview
   const generated = {
@@ -134,15 +136,15 @@ export function EditProfileModal({ nft, tokenId, entityName, entityCountry, curr
   return (
     <div style={{
       position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000, padding: 16, overflowY: 'auto',
+      display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center',
+      zIndex: 1000, padding: isMobile ? 0 : 16, overflowY: isMobile ? 'hidden' : 'auto',
     }}>
       <div style={{
-        background: 'var(--surface)', borderRadius: 20,
-        width: '100%', maxWidth: 560,
+        background: 'var(--surface)', borderRadius: isMobile ? '20px 20px 0 0' : 20,
+        width: '100%', maxWidth: isMobile ? '100%' : 560,
         boxShadow: '0 12px 60px rgba(0,0,0,0.35)',
         border: '1px solid var(--border)',
-        maxHeight: '92dvh', overflowY: 'auto',
+        maxHeight: isMobile ? '95dvh' : '92dvh', overflowY: 'auto',
       }}>
         {/* Header */}
         <div style={{

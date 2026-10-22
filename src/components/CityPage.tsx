@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIsMobile } from '../lib/useIsMobile';
 import { ArrowLeft, MapPin, Users, Globe, Crown, Building2, ExternalLink, Loader2 } from 'lucide-react';
 import {
   useAccount,
@@ -119,6 +120,7 @@ export function CityPage({ city, onBack }: CityPageProps) {
   }, [isClaimSuccess, city.name, refetchMinted]);
 
   const isBusy = isApproving || isApproveConfirming || isClaiming || isClaimConfirming;
+  const isMobile = useIsMobile();
 
   function btnLabel() {
     if (isWrongChain) return 'Switch to Arc Testnet';
@@ -214,11 +216,11 @@ export function CityPage({ city, onBack }: CityPageProps) {
           </div>
         </div>
 
-        {/* Two columns */}
+        {/* Two columns on desktop, single column on mobile */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(0,1.4fr) minmax(0,1fr)',
+            gridTemplateColumns: isMobile ? '1fr' : 'minmax(0,1.4fr) minmax(0,1fr)',
             gap: 20,
           }}
         >

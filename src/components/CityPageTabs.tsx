@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useIsMobile } from '../lib/useIsMobile';
 import type { City as CityDef } from '../lib/merkle';
 import { ACTIVITY_TRACKER, ACTIVITY_TYPE_LABELS, CITY_REGISTRY, DISTRICT_REGISTRY, DISTRICT_COUNT_BY_DISPLAY_TIER, LEASE_MANAGER, CHAIN_ID } from '../contracts';
 import { useReadContract, useReadContracts, useAccount } from 'wagmi';
@@ -104,10 +105,12 @@ export function CityPageTabs({ city, onBack, initialTab }: Props) {
   const lease = leaseData as [string, bigint, bigint, bigint, boolean] | undefined;
   const leaseEnd = lease && lease[4] ? Number(lease[2]) * 1000 : 0; // [2] = endTime, [4] = active
 
+  const isMobile = useIsMobile();
+
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 16px' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '16px 12px' : '24px 16px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
         <button
           onClick={onBack}
           style={{
@@ -115,38 +118,40 @@ export function CityPageTabs({ city, onBack, initialTab }: Props) {
             border: '1px solid var(--border)',
             color: 'var(--muted)',
             borderRadius: 8,
-            padding: '6px 14px',
+            padding: '6px 12px',
             cursor: 'pointer',
             fontSize: 13,
             fontFamily: "'DM Sans', sans-serif",
+            flexShrink: 0,
+            marginTop: 2,
           }}
         >
           ← Back
         </button>
-        <div>
-          <h1 style={{ color: 'var(--ink)', fontSize: 28, fontWeight: 700, margin: 0, letterSpacing: '-0.03em' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h1 style={{ color: 'var(--ink)', fontSize: isMobile ? 22 : 28, fontWeight: 700, margin: 0, letterSpacing: '-0.03em', wordBreak: 'break-word' }}>
             {city.name}
           </h1>
-          <p style={{ color: 'var(--muted)', margin: '2px 0 0', fontSize: 14 }}>
+          <p style={{ color: 'var(--muted)', margin: '2px 0 0', fontSize: 13 }}>
             {city.country} · Pop. {city.population.toLocaleString()}K
-            {totalCount > 0 && (
-              <span style={{ marginLeft: 12, color: 'var(--accent)' }}>
-                ⚡ {totalCount} activities · ${totalVolume.toFixed(2)} USDC volume
-              </span>
-            )}
           </p>
+          {totalCount > 0 && (
+            <p style={{ color: 'var(--accent)', margin: '2px 0 0', fontSize: 12 }}>
+              ⚡ {totalCount} activities · ${totalVolume.toFixed(2)} USDC volume
+            </p>
+          )}
         </div>
         {/* Activity badge */}
         {activityScore != null && BigInt(activityScore as bigint) > 0n && (
           <div style={{
-            marginLeft: 'auto',
             background: 'var(--accent-dim)',
             border: '1px solid var(--accent)',
             color: 'var(--accent)',
             borderRadius: 20,
-            padding: '4px 14px',
-            fontSize: 13,
+            padding: '4px 12px',
+            fontSize: 12,
             fontWeight: 600,
+            flexShrink: 0,
           }}>
             Score {Number(activityScore).toLocaleString()}
           </div>
@@ -186,28 +191,34 @@ export function CityPageTabs({ city, onBack, initialTab }: Props) {
         </div>
       )}
 
-      {/* Tab nav */}
+      {/* Tab nav — horizontally scrollable on mobile */}
       <div style={{
         display: 'flex', gap: 0,
         borderBottom: '1px solid var(--border)',
         marginBottom: 24,
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
       }}>
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             style={{
-              padding: '10px 20px',
+              padding: isMobile ? '10px 14px' : '10px 20px',
               background: 'none',
               border: 'none',
               borderBottom: activeTab === tab.id ? '2px solid var(--accent)' : '2px solid transparent',
               color: activeTab === tab.id ? 'var(--accent)' : 'var(--muted)',
               fontFamily: "'DM Sans', sans-serif",
               fontWeight: activeTab === tab.id ? 600 : 500,
-              fontSize: 14,
+              fontSize: isMobile ? 13 : 14,
               cursor: 'pointer',
               transition: 'all 0.12s',
               marginBottom: -1,
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
             }}
           >
             {tab.label}

@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useIsMobile } from '../lib/useIsMobile';
 import { useAccount, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { type Abi } from 'viem';
 import { ShoppingCart, X, Plus, ExternalLink, Loader2, AlertCircle, CheckCircle2, ChevronDown, ChevronUp, TrendingUp, Zap } from 'lucide-react';
@@ -93,6 +94,7 @@ function Header() {
 
 // ─── ListModal ────────────────────────────────────────────────────────────────
 function ListModal({ onClose, onListed }: { onClose: () => void; onListed: () => void }) {
+  const isMobile = useIsMobile();
   const { address } = useAccount();
   const { tokenIds: cityIds } = useOwnedTokens(address, CITY_REGISTRY.address);
   const { tokenIds: districtIds } = useOwnedTokens(address, DISTRICT_REGISTRY.address);
@@ -184,8 +186,8 @@ function ListModal({ onClose, onListed }: { onClose: () => void; onListed: () =>
   const ready = tokenId && priceUsdc && Number(priceUsdc) > 0 && !belowFloor;
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ background: 'var(--bg)', borderRadius: 18, padding: 28, width: 400, maxWidth: '90vw', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center' }} onClick={onClose}>
+      <div style={{ background: 'var(--bg)', borderRadius: isMobile ? '18px 18px 0 0' : 18, padding: isMobile ? '20px 20px 32px' : 28, width: isMobile ? '100%' : 400, maxWidth: isMobile ? '100%' : '90vw', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', maxHeight: '90dvh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ margin: 0, color: 'var(--ink)', fontSize: 20, fontWeight: 700 }}>List for Sale</h2>
           <button onClick={onClose} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--subtle)', padding: 4 }}><X size={20} /></button>
@@ -280,6 +282,7 @@ function ListModal({ onClose, onListed }: { onClose: () => void; onListed: () =>
 
 // ─── BuyModal ─────────────────────────────────────────────────────────────────
 function BuyModal({ listing, onClose, onBought }: { listing: Listing; onClose: () => void; onBought: () => void }) {
+  const isMobile = useIsMobile();
   const { address } = useAccount();
   const [phase, setPhase] = useState<'idle' | 'approving' | 'buying' | 'done' | 'error'>('idle');
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
@@ -337,8 +340,8 @@ function BuyModal({ listing, onClose, onBought }: { listing: Listing; onClose: (
     : (buyCity ? `${getDistrictName(dCityId, dIdx)} · ${buyCity.name}` : `District #${String(listing.tokenId)}`);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ background: 'var(--bg)', borderRadius: 18, padding: 28, width: 380, maxWidth: '90vw', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center' }} onClick={onClose}>
+      <div style={{ background: 'var(--bg)', borderRadius: isMobile ? '18px 18px 0 0' : 18, padding: isMobile ? '20px 20px 32px' : 28, width: isMobile ? '100%' : 380, maxWidth: isMobile ? '100%' : '90vw', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', maxHeight: '90dvh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ margin: 0, color: 'var(--ink)', fontSize: 20, fontWeight: 700 }}>Buy {assetLabel}</h2>
           <button onClick={onClose} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--subtle)', padding: 4 }}><X size={20} /></button>
