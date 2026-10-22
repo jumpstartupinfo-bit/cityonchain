@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ConnectKitButton } from 'connectkit';
 import { useAccount } from 'wagmi';
+import { WalletPill, WalletSheetRow } from './MobileWalletConnect';
 import {
   Globe, ShoppingBag, LayoutDashboard, Trophy,
   Shield, Settings, Zap, Calculator, ArrowLeftRight, X, ChevronRight,
@@ -100,35 +100,7 @@ export function Nav({ page, onNav }: NavProps) {
             </div>
 
             {/* Wallet button */}
-            <ConnectKitButton.Custom>
-              {({ isConnected, show, truncatedAddress }) => (
-                <button
-                  onClick={show}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    background: isConnected ? 'rgba(255,255,255,0.9)' : 'var(--green)',
-                    border: isConnected ? '1.5px solid rgba(45,122,58,0.35)' : 'none',
-                    borderRadius: 24,
-                    padding: '8px 18px',
-                    cursor: 'pointer',
-                    color: isConnected ? 'var(--green-dark)' : '#fff',
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: 600, fontSize: 14,
-                    whiteSpace: 'nowrap',
-                    boxShadow: isConnected ? 'none' : '0 2px 12px var(--green-glow)',
-                    transition: 'all 0.15s',
-                    minHeight: 44,
-                  }}
-                >
-                  {isConnected ? (
-                    <>
-                      <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--success)', flexShrink: 0 }} />
-                      {truncatedAddress}
-                    </>
-                  ) : 'Connect Wallet'}
-                </button>
-              )}
-            </ConnectKitButton.Custom>
+            <WalletPill />
           </div>
         </div>
       </nav>
@@ -279,35 +251,7 @@ export function Nav({ page, onNav }: NavProps) {
 
             {/* Wallet connect inside sheet */}
             <div style={{ marginTop: 8 }}>
-              <ConnectKitButton.Custom>
-                {({ isConnected, show, truncatedAddress }) => (
-                  <button
-                    onClick={show}
-                    style={{
-                      width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-                      background: 'var(--bg-alt)', border: 'none', borderRadius: 14,
-                      padding: '14px 16px', cursor: 'pointer', textAlign: 'left',
-                    }}
-                  >
-                    <div style={{
-                      width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-                      background: isConnected ? 'rgba(34,197,94,0.12)' : 'var(--green)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <span style={{ width: 10, height: 10, borderRadius: '50%', background: isConnected ? 'var(--success)' : '#fff', display: 'inline-block' }} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: 'var(--ink)', fontFamily: "'DM Sans', sans-serif" }}>
-                        {isConnected ? truncatedAddress : 'Connect Wallet'}
-                      </p>
-                      <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)', fontFamily: "'DM Sans', sans-serif" }}>
-                        {isConnected ? 'Wallet connected' : 'Tap to connect'}
-                      </p>
-                    </div>
-                    <ChevronRight size={16} color="var(--subtle)" />
-                  </button>
-                )}
-              </ConnectKitButton.Custom>
+              <WalletSheetRow page={page} />
             </div>
           </div>
         </>
