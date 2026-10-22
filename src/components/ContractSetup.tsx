@@ -466,9 +466,25 @@ function BackfillPanel() {
 // ── ContractSetup (main) ───────────────────────────────────────────────────
 export default function ContractSetup() {
   const { address } = useAccount();
-  const [started, setStarted] = useState(false);
-  const [doneSteps, setDoneSteps] = useState<Set<number>>(new Set());
+  const LS_KEY = 'cityonchain_setup_v1';
+  const [started, setStarted] = useState(() => {
+    try { const s = JSON.parse(localStorage.getItem(LS_KEY) ?? '{}') as Record<string, unknown>; return s['started'] === true; } catch { return false; }
+  });
+  const [doneSteps, setDoneSteps] = useState<Set<number>>(() => {
+    try { const s = JSON.parse(localStorage.getItem(LS_KEY) ?? '{}') as Record<string, unknown>; const d = s['done']; return new Set<number>(Array.isArray(d) ? (d as number[]) : []); } catch { return new Set(); }
+  });
   const [showVerify, setShowVerify] = useState(false);
+
+  // Persist wiring progress across refreshes
+  useEffect(() => {
+    try { localStorage.setItem(LS_KEY, JSON.stringify({ started, done: [...doneSteps] })); } catch { /* ignore */ }
+  }, [started, doneSteps]);
+
+  const resetProgress = useCallback(() => {
+    try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
+    setStarted(false);
+    setDoneSteps(new Set());
+  }, []);
 
   // Single batch read for all pre-checks — one multicall, no per-hook instances
   const { data: preCheckData, isFetching: preCheckLoading } = useReadContracts({
@@ -528,10 +544,15 @@ export default function ContractSetup() {
         <div>
           <h1 className="text-2xl font-bold text-white">Contract Setup</h1>
           <p className="text-sm text-slate-400 mt-1">Wire all contracts from the owner wallet. Each call requires one wallet confirmation.</p>
-          <p className="text-xs text-slate-500 mt-1">
-            {preCheckLoading ? 'Reading on-chain state…'
-              : `${pendingCount} of ${WIRE_CALLS.length} calls pending`}
-          </p>
+          <div className="flex items-center justify-between mt-1">
+            <p className="text-xs text-slate-500">
+              {preCheckLoading ? 'Reading on-chain state…'
+                : `${pendingCount} of ${WIRE_CALLS.length} calls pending`}
+            </p>
+            {(started || doneSteps.size > 0) && (
+              <button onClick={resetProgress} className="text-xs text-slate-600 hover:text-slate-400 underline">Reset progress</button>
+            )}
+          </div>
         </div>
 
         {preCheckDone && !allDone && !started && pendingCount > 0 && (
