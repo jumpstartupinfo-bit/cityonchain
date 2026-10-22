@@ -8,14 +8,14 @@ import {
 } from 'lucide-react';
 import { ADMIN_ADDRESS } from '../contracts';
 
-type Page = 'world' | 'marketplace' | 'myassets' | 'city' | 'admin' | 'leaderboards' | 'about-data' | 'setup' | 'calculator' | 'bridge';
+type Page = 'home' | 'explore' | 'marketplace' | 'myassets' | 'city' | 'admin' | 'leaderboards' | 'about-data' | 'setup' | 'calculator' | 'bridge';
 
 interface NavProps { page: Page; onNav: (p: Page) => void; }
 
 type LucideIcon = React.FC<LucideProps>;
 
 const BOTTOM_TABS: { id: Page; icon: LucideIcon; label: string }[] = [
-  { id: 'world',        icon: Globe,           label: 'World'      },
+  { id: 'explore',      icon: Globe,           label: 'Explore'    },
   { id: 'marketplace',  icon: ShoppingBag,     label: 'Market'     },
   { id: 'myassets',     icon: LayoutDashboard, label: 'My Assets'  },
   { id: 'leaderboards', icon: Trophy,          label: 'Leaders'    },
@@ -23,7 +23,7 @@ const BOTTOM_TABS: { id: Page; icon: LucideIcon; label: string }[] = [
 ];
 
 const DESKTOP_LINKS: { id: Page; icon: LucideIcon; label: string }[] = [
-  { id: 'world',        icon: Globe,           label: 'World'       },
+  { id: 'explore',      icon: Globe,           label: 'Explore'     },
   { id: 'marketplace',  icon: ShoppingBag,     label: 'Marketplace' },
   { id: 'myassets',     icon: LayoutDashboard, label: 'My Assets'   },
   { id: 'leaderboards', icon: Trophy,          label: 'Leaderboard' },
@@ -52,7 +52,7 @@ export function Nav({ page, onNav }: NavProps) {
         }}>
           {/* Logo */}
           <button
-            onClick={() => onNav('world')}
+            onClick={() => onNav('home')}
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
               background: 'none', border: 'none', cursor: 'pointer',
@@ -152,14 +152,14 @@ export function Nav({ page, onNav }: NavProps) {
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
               justifyContent: 'center', gap: 3, padding: '10px 4px 8px',
               background: 'none', border: 'none', cursor: 'pointer',
-              color: page === id ? 'var(--green)' : 'var(--subtle)',
+              color: (page === id || (id === 'explore' && page === 'home')) ? 'var(--green)' : 'var(--subtle)',
               fontFamily: "'DM Sans', sans-serif",
-              fontWeight: page === id ? 600 : 400, fontSize: 10,
+              fontWeight: (page === id || (id === 'explore' && page === 'home')) ? 600 : 400, fontSize: 10,
               minHeight: 56, transition: 'color 0.12s',
               position: 'relative',
             }}
           >
-            {page === id && (
+            {(page === id || (id === 'explore' && page === 'home')) && (
               <span style={{
                 position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: 24, height: 3, borderRadius: 2, background: 'var(--green)',
@@ -177,7 +177,7 @@ export function Nav({ page, onNav }: NavProps) {
             flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
             justifyContent: 'center', gap: 3, padding: '10px 4px 8px',
             background: 'none', border: 'none', cursor: 'pointer',
-            color: ['calculator', 'admin', 'setup'].includes(page) ? 'var(--green)' : 'var(--subtle)',
+            color: (['calculator', 'admin', 'setup'] as Page[]).includes(page) ? 'var(--green)' : 'var(--subtle)',
             fontFamily: "'DM Sans', sans-serif",
             fontWeight: 400, fontSize: 10,
             minHeight: 56, transition: 'color 0.12s',
