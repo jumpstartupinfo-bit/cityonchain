@@ -1,30 +1,44 @@
 import React, { useState } from 'react';
 import { ConnectKitButton } from 'connectkit';
 import { useAccount } from 'wagmi';
-import { Globe, ShoppingBag, LayoutDashboard, Trophy, Shield, Settings, Menu, X, Zap, Calculator, ArrowLeftRight } from 'lucide-react';
+import {
+  Globe, ShoppingBag, LayoutDashboard, Trophy,
+  Shield, Settings, Zap, Calculator, ArrowLeftRight, X, ChevronRight,
+  type LucideProps,
+} from 'lucide-react';
 import { ADMIN_ADDRESS } from '../contracts';
 
 type Page = 'world' | 'marketplace' | 'myassets' | 'city' | 'admin' | 'leaderboards' | 'about-data' | 'setup' | 'calculator' | 'bridge';
 
 interface NavProps { page: Page; onNav: (p: Page) => void; }
 
-const NAV_LINKS = [
-  { id: 'world'        as Page, icon: Globe,          label: 'World'       },
-  { id: 'marketplace'  as Page, icon: ShoppingBag,     label: 'Marketplace' },
-  { id: 'myassets'     as Page, icon: LayoutDashboard, label: 'My Assets'   },
-  { id: 'leaderboards' as Page, icon: Trophy,          label: 'Leaderboard' },
-  { id: 'bridge'       as Page, icon: ArrowLeftRight,  label: 'Bridge'      },
-  { id: 'calculator'   as Page, icon: Calculator,      label: 'Calculator'  },
+type LucideIcon = React.FC<LucideProps>;
+
+const BOTTOM_TABS: { id: Page; icon: LucideIcon; label: string }[] = [
+  { id: 'world',        icon: Globe,           label: 'World'      },
+  { id: 'marketplace',  icon: ShoppingBag,     label: 'Market'     },
+  { id: 'myassets',     icon: LayoutDashboard, label: 'My Assets'  },
+  { id: 'leaderboards', icon: Trophy,          label: 'Leaders'    },
+  { id: 'bridge',       icon: ArrowLeftRight,  label: 'Bridge'     },
+];
+
+const DESKTOP_LINKS: { id: Page; icon: LucideIcon; label: string }[] = [
+  { id: 'world',        icon: Globe,           label: 'World'       },
+  { id: 'marketplace',  icon: ShoppingBag,     label: 'Marketplace' },
+  { id: 'myassets',     icon: LayoutDashboard, label: 'My Assets'   },
+  { id: 'leaderboards', icon: Trophy,          label: 'Leaderboard' },
+  { id: 'bridge',       icon: ArrowLeftRight,  label: 'Bridge'      },
+  { id: 'calculator',   icon: Calculator,      label: 'Calculator'  },
 ];
 
 export function Nav({ page, onNav }: NavProps) {
   const { address } = useAccount();
   const isAdmin = address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   return (
     <>
-      {/* Desktop + tablet nav */}
+      {/* ─── Desktop nav ─────────────────────────────────────────── */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 200,
         background: 'rgba(255,255,255,0.92)',
@@ -61,9 +75,9 @@ export function Nav({ page, onNav }: NavProps) {
             </span>
           </button>
 
-          {/* Nav links — desktop */}
+          {/* Desktop nav links */}
           <div style={{ display: 'flex', gap: 2, flex: 1 }} className="hidden-mobile">
-            {NAV_LINKS.map(({ id, icon: Icon, label }) => (
+            {DESKTOP_LINKS.map(({ id, icon: Icon, label }) => (
               <NavBtn key={id} active={page === id} icon={<Icon size={15} />} label={label} onClick={() => onNav(id)} />
             ))}
             {isAdmin && (
@@ -75,7 +89,7 @@ export function Nav({ page, onNav }: NavProps) {
           </div>
 
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-            {/* Activity ticker */}
+            {/* Live badge — desktop only */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: 6,
               background: 'var(--green-dim)', borderRadius: 20,
@@ -103,6 +117,7 @@ export function Nav({ page, onNav }: NavProps) {
                     whiteSpace: 'nowrap',
                     boxShadow: isConnected ? 'none' : '0 2px 12px var(--green-glow)',
                     transition: 'all 0.15s',
+                    minHeight: 44,
                   }}
                 >
                   {isConnected ? (
@@ -114,46 +129,199 @@ export function Nav({ page, onNav }: NavProps) {
                 </button>
               )}
             </ConnectKitButton.Custom>
-
-            {/* Mobile menu toggle */}
-            <button
-              onClick={() => setMenuOpen(v => !v)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, display: 'none' }}
-              className="show-mobile"
-            >
-              {menuOpen ? <X size={22} color="var(--ink)" /> : <Menu size={22} color="var(--ink)" />}
-            </button>
           </div>
         </div>
-
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div style={{
-            borderTop: '1px solid var(--border)',
-            background: 'rgba(255,255,255,0.97)',
-            padding: '12px 20px 16px',
-          }}>
-            {NAV_LINKS.map(({ id, icon: Icon, label }) => (
-              <button key={id} onClick={() => { onNav(id); setMenuOpen(false); }} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                width: '100%', background: page === id ? 'var(--green-dim)' : 'none',
-                border: 'none', borderRadius: 10, padding: '12px 14px',
-                color: page === id ? 'var(--green)' : 'var(--ink-2)',
-                fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 15,
-                cursor: 'pointer', marginBottom: 2,
-              }}>
-                <Icon size={17} /> {label}
-              </button>
-            ))}
-          </div>
-        )}
       </nav>
 
-      {/* Responsive helpers */}
+      {/* ─── Mobile bottom tab bar ───────────────────────────────── */}
+      <div className="show-mobile" style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 300,
+        background: 'rgba(255,255,255,0.96)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderTop: '1px solid rgba(45,122,58,0.14)',
+        display: 'flex',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        boxShadow: '0 -4px 20px rgba(26,46,26,0.10)',
+      }}>
+        {BOTTOM_TABS.map(({ id, icon: Icon, label }) => (
+          <button
+            key={id}
+            onClick={() => onNav(id)}
+            style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+              justifyContent: 'center', gap: 3, padding: '10px 4px 8px',
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: page === id ? 'var(--green)' : 'var(--subtle)',
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: page === id ? 600 : 400, fontSize: 10,
+              minHeight: 56, transition: 'color 0.12s',
+              position: 'relative',
+            }}
+          >
+            {page === id && (
+              <span style={{
+                position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: 24, height: 3, borderRadius: 2, background: 'var(--green)',
+              }} />
+            )}
+            <Icon size={20} />
+            <span>{label}</span>
+          </button>
+        ))}
+
+        {/* "More" tab for Calculator + Admin + Setup */}
+        <button
+          onClick={() => setMoreOpen(v => !v)}
+          style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', gap: 3, padding: '10px 4px 8px',
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: ['calculator', 'admin', 'setup'].includes(page) ? 'var(--green)' : 'var(--subtle)',
+            fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 400, fontSize: 10,
+            minHeight: 56, transition: 'color 0.12s',
+          }}
+        >
+          <Calculator size={20} />
+          <span>More</span>
+        </button>
+      </div>
+
+      {/* ─── Mobile "More" sheet ─────────────────────────────────── */}
+      {moreOpen && (
+        <>
+          <div
+            onClick={() => setMoreOpen(false)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 350,
+              background: 'rgba(17,28,17,0.45)',
+              backdropFilter: 'blur(2px)',
+            }}
+          />
+          <div style={{
+            position: 'fixed', bottom: 'calc(56px + env(safe-area-inset-bottom))', left: 0, right: 0,
+            zIndex: 360,
+            background: 'rgba(255,255,255,0.98)',
+            borderRadius: '20px 20px 0 0',
+            padding: '16px 16px 8px',
+            boxShadow: '0 -8px 40px rgba(26,46,26,0.18)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--ink)', fontFamily: "'Space Grotesk', sans-serif" }}>More</span>
+              <button onClick={() => setMoreOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+                <X size={18} color="var(--muted)" />
+              </button>
+            </div>
+
+            {([
+              { id: 'calculator', icon: Calculator as LucideIcon, label: 'Income Calculator', sub: 'Estimate your earnings' },
+              { id: 'bridge', icon: ArrowLeftRight as LucideIcon, label: 'Bridge USDC', sub: 'Move USDC to Arc' },
+            ] as { id: Page; icon: LucideIcon; label: string; sub: string }[]).map(({ id, icon: Icon, label, sub }) => (
+              <button
+                key={id}
+                onClick={() => { onNav(id); setMoreOpen(false); }}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                  background: page === id ? 'var(--green-dim)' : 'var(--bg-alt)',
+                  border: 'none', borderRadius: 14, padding: '14px 16px',
+                  cursor: 'pointer', marginBottom: 8, textAlign: 'left',
+                }}
+              >
+                <div style={{
+                  width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                  background: page === id ? 'var(--green)' : 'rgba(45,122,58,0.12)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon size={18} color={page === id ? '#fff' : 'var(--green)'} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: 'var(--ink)', fontFamily: "'DM Sans', sans-serif" }}>{label}</p>
+                  <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)', fontFamily: "'DM Sans', sans-serif" }}>{sub}</p>
+                </div>
+                <ChevronRight size={16} color="var(--subtle)" />
+              </button>
+            ))}
+
+            {isAdmin && (
+              <>
+                <div style={{ height: 1, background: 'var(--border)', margin: '8px 0' }} />
+                {([
+                  { id: 'admin', icon: Shield as LucideIcon, label: 'Admin Dashboard', sub: 'Platform management' },
+                  { id: 'setup', icon: Settings as LucideIcon, label: 'Contract Setup', sub: 'Wire contracts' },
+                ] as { id: Page; icon: LucideIcon; label: string; sub: string }[]).map(({ id, icon: Icon, label, sub }) => (
+                  <button
+                    key={id}
+                    onClick={() => { onNav(id); setMoreOpen(false); }}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                      background: page === id ? 'rgba(200,146,42,0.10)' : 'var(--bg-alt)',
+                      border: 'none', borderRadius: 14, padding: '14px 16px',
+                      cursor: 'pointer', marginBottom: 8, textAlign: 'left',
+                    }}
+                  >
+                    <div style={{
+                      width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                      background: 'rgba(200,146,42,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Icon size={18} color="var(--accent)" />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: 'var(--ink)', fontFamily: "'DM Sans', sans-serif" }}>{label}</p>
+                      <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)', fontFamily: "'DM Sans', sans-serif" }}>{sub}</p>
+                    </div>
+                    <ChevronRight size={16} color="var(--subtle)" />
+                  </button>
+                ))}
+              </>
+            )}
+
+            {/* Wallet connect inside sheet */}
+            <div style={{ marginTop: 8 }}>
+              <ConnectKitButton.Custom>
+                {({ isConnected, show, truncatedAddress }) => (
+                  <button
+                    onClick={show}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                      background: 'var(--bg-alt)', border: 'none', borderRadius: 14,
+                      padding: '14px 16px', cursor: 'pointer', textAlign: 'left',
+                    }}
+                  >
+                    <div style={{
+                      width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                      background: isConnected ? 'rgba(34,197,94,0.12)' : 'var(--green)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <span style={{ width: 10, height: 10, borderRadius: '50%', background: isConnected ? 'var(--success)' : '#fff', display: 'inline-block' }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: 'var(--ink)', fontFamily: "'DM Sans', sans-serif" }}>
+                        {isConnected ? truncatedAddress : 'Connect Wallet'}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)', fontFamily: "'DM Sans', sans-serif" }}>
+                        {isConnected ? 'Wallet connected' : 'Tap to connect'}
+                      </p>
+                    </div>
+                    <ChevronRight size={16} color="var(--subtle)" />
+                  </button>
+                )}
+              </ConnectKitButton.Custom>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ─── Responsive helpers ───────────────────────────────────── */}
       <style>{`
         @media (max-width: 720px) {
           .hidden-mobile { display: none !important; }
-          .show-mobile { display: flex !important; }
+          .show-mobile   { display: flex !important; }
+          /* Push page content above bottom tab bar */
+          #root > div > *:not(nav):not(.mobile-bottom-nav) {
+            padding-bottom: calc(56px + env(safe-area-inset-bottom));
+          }
         }
         @media (min-width: 721px) {
           .show-mobile { display: none !important; }
@@ -178,7 +346,7 @@ function NavBtn({ active, icon, label, onClick, admin }: {
           : (admin ? 'var(--accent-light)' : 'var(--muted)'),
         fontFamily: "'DM Sans', sans-serif",
         fontWeight: active ? 600 : 500, fontSize: 14,
-        cursor: 'pointer', transition: 'all 0.12s', minHeight: 36,
+        cursor: 'pointer', transition: 'all 0.12s', minHeight: 44,
       }}
     >
       {icon}{label}

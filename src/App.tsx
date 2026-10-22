@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Nav } from './components/Nav';
+import { InstallPrompt } from './components/InstallPrompt';
 import { WorldMap } from './components/WorldMap';
 import { CityPageTabs } from './components/CityPageTabs';
 import { Marketplace } from './components/Marketplace';
@@ -65,6 +66,7 @@ export default function App() {
       {page === 'calculator' && <IncomeCalculator />}
       {page === 'bridge' && <BridgePanel />}
       {page === 'about-data' && <AboutData onBack={() => handleNav('world')} />}
+      <InstallPrompt />
     </div>
   );
 }
