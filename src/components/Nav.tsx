@@ -3,7 +3,7 @@ import { useAccount } from 'wagmi';
 import { WalletPill, WalletSheetRow } from './MobileWalletConnect';
 import {
   Globe, ShoppingBag, LayoutDashboard, Trophy,
-  Shield, Settings, Zap, Calculator, ArrowLeftRight, X, ChevronRight,
+  Shield, Settings, Calculator, ArrowLeftRight, X, ChevronRight,
   type LucideProps,
 } from 'lucide-react';
 import { ADMIN_ADDRESS } from '../contracts';
@@ -59,14 +59,11 @@ export function Nav({ page, onNav }: NavProps) {
               padding: '4px 10px 4px 0', marginRight: 4,
             }}
           >
-            <div style={{
-              width: 32, height: 32, borderRadius: 10,
-              background: 'var(--green)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 8px var(--green-glow)',
-            }}>
-              <Zap size={17} color="#fff" fill="#fff" />
-            </div>
+            <img
+              src="/icon.svg"
+              alt="CityOnChain"
+              style={{ width: 36, height: 36, borderRadius: 8 }}
+            />
             <span className="display" style={{
               color: 'var(--ink)', fontSize: 17, fontWeight: 700,
               letterSpacing: '-0.02em',
