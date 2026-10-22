@@ -387,21 +387,28 @@ export function LandingPage({ onBrowse, onReferral, onCalculator }: LandingPageP
           >
             Explore Cities <ArrowRight size={16} />
           </button>
+        </div>
+
+        {/* Referral nudge — between CTA and chips */}
+        <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
           <button
             onClick={onReferral}
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'transparent', color: 'var(--text-1)',
-              border: '1.5px solid var(--border)', borderRadius: 12, padding: '14px 28px',
-              fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 16, cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: 'var(--green-faint, rgba(34,197,94,0.1))',
+              border: '1px solid var(--green-border, rgba(34,197,94,0.25))',
+              borderRadius: 100, padding: '7px 16px',
+              fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: 13,
+              color: 'var(--green)', cursor: 'pointer',
             }}
           >
-            Earn Referrals
+            <Star size={13} />
+            Earn 20% for Every Referral that Buys a City <ArrowRight size={12} />
           </button>
         </div>
 
-        {/* Tagline chip */}
-        <div style={{ marginTop: 36, display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+        {/* Tagline chips */}
+        <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
           {[
             { icon: Globe,     text: '24,323 cities' },
             { icon: MapPin,    text: '195 countries' },
