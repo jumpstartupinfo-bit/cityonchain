@@ -4,8 +4,8 @@
   "description": "Own cities, manage districts, earn USDC onchain",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f2f5ef",
-  "theme_color": "#2d7a3a",
+  "background_color": "#1a4d2a",
+  "theme_color": "#1a4d2a",
   "orientation": "portrait-primary",
   "icons": [
     {
